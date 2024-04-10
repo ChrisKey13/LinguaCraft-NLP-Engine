@@ -11,13 +11,6 @@ def test_process_text_common_scenario(setup_nlp_engine):
     pos_elements = processor.process_text(text)
     expected_nouns = ["volpe", "cane"]
     assert set(pos_elements['nouns']) == set(expected_nouns)
-    
-def test_process_text_empty_input(setup_nlp_engine):
-    processor = setup_nlp_engine
-    empty_input = ""
-    with pytest.raises(ValueError) as excinfo:
-        processor.process_text(empty_input)
-    assert "Invalid text input" in str(excinfo.value)
 
 @pytest.mark.parametrize("text,expected_output", [
     ("La volpe salta alto.",
@@ -38,10 +31,16 @@ def test_extract_pos_elements_varied_input(text, expected_output, setup_nlp_engi
     processor = setup_nlp_engine
     pos_elements = processor.process_text(text)
     assert pos_elements == expected_output
+    
+@pytest.mark.parametrize("text, exception_message", [
+    ("", "Input cannot be empty or whitespace"),
+    ("   ", "Input cannot be empty or whitespace"),
+    ("@#$%^&*", "Input contains invalid characters"),
+    ("√§√∏√ß√±√£√≠", "Input contains invalid characters")
+])
 
-def test_nlp_engine_with_unexpected_input(setup_nlp_engine):
+def test_invalid_input(setup_nlp_engine, text, exception_message):
     processor = setup_nlp_engine
-    unexpected_input = "√§√∏√ß√±√£√≠"
     with pytest.raises(ValueError) as excinfo:
-        processor.process_text(unexpected_input)
-    assert "Input contains invalid characters" in str(excinfo.value)
+        processor.process_text(text)
+    assert exception_message in str(excinfo.value)

@@ -15,18 +15,20 @@ class LinguisticProcessor:
         if "correct_verb_forms" not in self.nlp.pipe_names:
             self.nlp.add_pipe("correct_verb_forms", last=True)
         
-    def process_text(self, text):
-        if not isinstance(text, str) or not text:
-            raise ValueError("Invalid text input")
+    def validate_text(self, text):
+        if not isinstance(text, str):
+            raise ValueError("Input must be a string")
         if not text.strip():
             raise ValueError("Input cannot be empty or whitespace")
         if not re.match(r'^[\w\s,.!?]+$', text):
             raise ValueError("Input contains invalid characters.")
+        
+    def process_text(self, text):
+        self.validate_text(text)
         doc = self.nlp(text)
         pos_elements = {"verbs": [], "nouns": [], "adjectives": [], "prepositions": []}
         
         for token in doc:
-            print(f"Token: {token.text}, Lemma: {token.lemma_}, POS: {token.pos_}")
             if token.pos_ == "VERB" or (token.pos_ == "AUX" and token.lemma_ == "venire"):
                 pos_elements["verbs"].append(token.lemma_.lower())
             elif token._.is_noun:
