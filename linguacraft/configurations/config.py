@@ -1,0 +1,1 @@
+MODEL_NAME = "it_core_news_lg"
